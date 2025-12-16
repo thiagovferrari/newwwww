@@ -66,12 +66,12 @@ export const enhanceReminder = async (text: string): Promise<AIResponse> => {
 
     throw new Error("No response text from AI");
 
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error enhancing reminder:", error);
-    // Fallback in case of error
+    // Fallback in case of error with details
     return {
       improvedTitle: text,
-      improvedDescription: "Não foi possível conectar à IA. Verifique sua chave de API.",
+      improvedDescription: `Erro na IA: ${error.message || "Falha desconhecida"}. Verifique se a chave VITE_GOOGLE_AI_KEY está correta e se a api do Gemini está habilitada.`,
       suggestedPriority: Priority.MEDIUM
     };
   }
