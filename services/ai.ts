@@ -2,7 +2,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 import { Priority, AIResponse } from "../types";
 
 // Initialize Gemini API
-const apiKey = process.env.API_KEY || ''; 
+const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY || '';
 const ai = new GoogleGenAI({ apiKey });
 
 export const enhanceReminder = async (text: string): Promise<AIResponse> => {
@@ -54,7 +54,7 @@ export const enhanceReminder = async (text: string): Promise<AIResponse> => {
         suggestedPriority: data.suggestedPriority as Priority,
       };
     }
-    
+
     throw new Error("No response text from AI");
 
   } catch (error) {

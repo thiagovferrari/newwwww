@@ -190,13 +190,13 @@ const App: React.FC = () => {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {/* Intro / AI Callout */}
-        {!process.env.API_KEY && (
+        {!import.meta.env.VITE_GOOGLE_AI_KEY && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 flex items-start gap-3">
             <BrainCircuit className="text-yellow-600 flex-shrink-0 mt-0.5" size={20} />
             <div>
               <h3 className="font-semibold text-yellow-800 text-sm">IA não configurada</h3>
               <p className="text-yellow-700 text-sm mt-1">
-                Para usar os recursos de aprimoramento de texto com IA, configure sua <code>API_KEY</code> do Gemini no ambiente.
+                Para usar os recursos de aprimoramento de texto com IA, configure sua <code>VITE_GOOGLE_AI_KEY</code> do Gemini no ambiente.
               </p>
             </div>
           </div>
