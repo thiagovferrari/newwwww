@@ -3,7 +3,7 @@ import { Priority, AIResponse } from "../types";
 
 // Initialize Gemini API
 // Ensure we use the VITE_ prefixed variable for client-side access
-const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY || '';
+const apiKey = (import.meta.env.VITE_GOOGLE_AI_KEY || '').trim();
 
 // Initialize the client only if key exists to avoid immediate errors
 const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
