@@ -1,53 +1,62 @@
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { Priority, AIResponse } from "../types";
 
 // Initialize Gemini API
+// Ensure we use the VITE_ prefixed variable for client-side access
 const apiKey = import.meta.env.VITE_GOOGLE_AI_KEY || '';
-const ai = new GoogleGenAI({ apiKey });
+
+// Initialize the client only if key exists to avoid immediate errors
+const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
 export const enhanceReminder = async (text: string): Promise<AIResponse> => {
-  if (!apiKey) {
+  if (!genAI) {
     console.warn("API Key is missing. Returning default fallback.");
     return {
       improvedTitle: text,
-      improvedDescription: "Adicione uma chave de API para sugestões inteligentes.",
+      improvedDescription: "Adicione sua chave VITE_GOOGLE_AI_KEY nas variáveis de ambiente da Vercel.",
       suggestedPriority: Priority.MEDIUM
     };
   }
 
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: `Analise este lembrete bruto: "${text}". 
-      Melhore o texto para ser mais claro e acionável. 
-      Sugira uma prioridade (Baixa, Média, Alta) baseada na urgência implícita.
-      Se o texto for muito curto, expanda com detalhes lógicos.`,
-      config: {
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      generationConfig: {
         responseMimeType: "application/json",
         responseSchema: {
-          type: Type.OBJECT,
+          type: SchemaType.OBJECT,
           properties: {
             improvedTitle: {
-              type: Type.STRING,
+              type: SchemaType.STRING,
               description: "Um título curto e claro para a tarefa",
             },
             improvedDescription: {
-              type: Type.STRING,
+              type: SchemaType.STRING,
               description: "Uma descrição detalhada e acionável",
             },
             suggestedPriority: {
-              type: Type.STRING,
+              type: SchemaType.STRING,
               enum: ["Baixa", "Média", "Alta"],
               description: "A prioridade sugerida para a tarefa",
             },
           },
           required: ["improvedTitle", "improvedDescription", "suggestedPriority"],
-        },
-      },
+        }
+      }
     });
 
-    if (response.text) {
-      const data = JSON.parse(response.text);
+    const prompt = `Analise este lembrete bruto: "${text}". 
+    Melhore o texto para ser mais claro e acionável. 
+    Sugira uma prioridade (Baixa, Média, Alta) baseada na urgência implícita.
+    Se o texto for muito curto, expanda com detalhes lógicos.
+    Responda APENAS com o JSON.`;
+
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonString = response.text();
+
+    if (jsonString) {
+      const data = JSON.parse(jsonString);
       return {
         improvedTitle: data.improvedTitle,
         improvedDescription: data.improvedDescription,
@@ -62,7 +71,7 @@ export const enhanceReminder = async (text: string): Promise<AIResponse> => {
     // Fallback in case of error
     return {
       improvedTitle: text,
-      improvedDescription: "Não foi possível melhorar o texto automaticamente no momento.",
+      improvedDescription: "Não foi possível conectar à IA. Verifique sua chave de API.",
       suggestedPriority: Priority.MEDIUM
     };
   }
