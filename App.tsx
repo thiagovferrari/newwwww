@@ -3,7 +3,7 @@ import { Reminder } from './types';
 import ReminderForm from './components/ReminderForm';
 import ReminderList from './components/ReminderList';
 import { Layout, BrainCircuit } from 'lucide-react';
-import { supabase } from './lib/supabase';
+import { supabase } from './src/lib/supabase';
 
 const App: React.FC = () => {
   const [reminders, setReminders] = useState<Reminder[]>([]);
@@ -216,8 +216,8 @@ const App: React.FC = () => {
               key={f}
               onClick={() => setFilter(f)}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${filter === f
-                  ? 'border-primary text-primary'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
+                ? 'border-primary text-primary'
+                : 'border-transparent text-slate-500 hover:text-slate-700'
                 }`}
             >
               {f === 'all' ? 'Todos' : f === 'active' ? 'Pendentes' : 'Concluídos'}
